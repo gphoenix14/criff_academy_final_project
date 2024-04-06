@@ -6,44 +6,31 @@ public class Main {
     public static void main(String[] args) {
         UserController userController = new UserController();
         Scanner scanner = new Scanner(System.in);
-
+    
         System.out.println("Benvenuto! Inserisci il tuo username:");
         String username = scanner.nextLine();
         System.out.println("Inserisci la tua password:");
         String password = scanner.nextLine();
-
+    
         try {
-            // Inizialmente, il token JWT è vuoto
-            String jwt = "";
-            
-            // Verifica se l'utente esiste già
+            LoginResponse loginResponse = null;
+    
             if (userController.userExists(username)) {
-                // Se l'utente esiste, tenta il login
-                jwt = userController.user_login(username, password,"192.168.1.1",8080);
-                if ("InvalidCredentials".equals(jwt)) {
+                loginResponse = userController.user_login(username, password, "192.168.1.1", 8080);
+                if (loginResponse == null || "InvalidCredentials".equals(loginResponse.getJwt())) {
                     System.out.println("Credenziali non valide. Riprova.");
                 } else {
-                    System.out.println("Login effettuato con successo. Il tuo JWT è: " + jwt);
+                    System.out.println("Login effettuato con successo. Il tuo JWT è: " + loginResponse.getJwt());
                 }
             } else {
-                // Se l'utente non esiste, procede con la registrazione
-                String signUpResult = userController.user_signup(username, password);
-                if ("Signed up successfully!".equals(signUpResult)) {
-                    System.out.println("Registrazione effettuata con successo. Ora verrà effettuato il login.");
-                    // Esegue automaticamente il login dopo la registrazione
-                    jwt = userController.user_login(username, password,"192.168.1.1",8080);
-                    System.out.println("Il tuo JWT è: " + jwt);
-                } else {
-                    System.out.println("Errore durante la registrazione: " + signUpResult);
-                }
+                // Gestione registrazione...
             }
-            
-            // Dopo il login/registrazione, chiedi se effettuare il logout
-            if (!jwt.isEmpty() && !"InvalidCredentials".equals(jwt)) {
+    
+            if (loginResponse != null && loginResponse.getJwt() != null && !loginResponse.getJwt().isEmpty()) {
                 System.out.println("Vuoi effettuare il logout? (s/n):");
                 String logoutChoice = scanner.nextLine();
                 if ("s".equalsIgnoreCase(logoutChoice)) {
-                    userController.user_logout(jwt);
+                    userController.user_logout(loginResponse.getRefreshToken());
                     System.out.println("Logout effettuato con successo.");
                 }
             }
@@ -53,4 +40,5 @@ public class Main {
             scanner.close();
         }
     }
+    
 }

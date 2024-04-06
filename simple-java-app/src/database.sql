@@ -45,7 +45,7 @@ CREATE TABLE sessions (
     id_session SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     start_session_date TIMESTAMP NOT NULL,
-    end_session_date TIMESTAMP,
+    expires_at TIMESTAMP,
     id_connection INTEGER NOT NULL,
     refresh_token VARCHAR(255) NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

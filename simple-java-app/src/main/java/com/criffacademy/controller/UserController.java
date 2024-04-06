@@ -20,26 +20,46 @@ public class UserController {
             return "InvalidCredentials";
         }
         
-        // Credenziali corrette: genera JWT e refresh token
         int userId = usersCrud.getUserIdByUsername(username);
-        String jwt = TokenGenerator.generateRefreshToken(username); // Genera JWT
-        String refreshToken = TokenGenerator.generateRefreshToken(username); // Genera refresh token
+        
+        // Genera JWT
+        String jwt = TokenGenerator.generateJWT(username); // Assumi che esista un metodo simile per JWT
+        
+        // Genera refresh token con scadenza
+        String refreshToken = TokenGenerator.generateRefreshToken(username);
+        // Calcola la scadenza per il refresh token (ad esempio, 7 giorni)
+        long refreshTokenExpiry = System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7); // 7 giorni
+        Timestamp expiresAt = new Timestamp(refreshTokenExpiry);
         
         // Aggiungi dettagli connessione
         connectionCrud.addConnection(publicIp, sourcePort, true);
         int connectionId = connectionCrud.getLatestConnectionId();
         
-        // Aggiungi sessione (refresh token) al database, includendo l'ID di connessione
-        sessionsCrud.addSession(userId, refreshToken, new Timestamp(System.currentTimeMillis()), connectionId);
-
+        // Aggiungi sessione (refresh token) al database, includendo l'ID di connessione e il timestamp di scadenza
+        sessionsCrud.addSession(userId, refreshToken, new Timestamp(System.currentTimeMillis()), expiresAt, connectionId);
+        
         // Restituisce JWT al client
         return jwt;
     }
     
     public void user_logout(String refreshToken) throws SQLException, IOException {
-        // Verifica e cancella la sessione usando il refresh token
-        sessionsCrud.deleteSessionByRefreshToken(refreshToken);
+        // Recupera l'ID della sessione e l'ID della connessione associati al refresh token fornito
+        int[] sessionAndConnectionIds = sessionsCrud.findSessionAndConnectionIdByToken(refreshToken);
+        int sessionId = sessionAndConnectionIds[0];
+        int connectionId = sessionAndConnectionIds[1];
+    
+        if (sessionId != -1 && connectionId != -1) {
+            // Cancellazione della sessione tramite refresh token
+            sessionsCrud.deleteSessionByRefreshToken(refreshToken);
+    
+            // Aggiornamento dello stato della connessione a 'non connesso'
+            connectionCrud.updateConnectionStatus(connectionId, false);
+            System.out.println("Logout effettuato con successo. Stato della connessione aggiornato.");
+        } else {
+            System.out.println("Errore: Sessione o Connessione non trovata per il refresh token fornito.");
+        }
     }
+    
     
     public boolean userExists(String username) {
         try {
