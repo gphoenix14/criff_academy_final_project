@@ -28,15 +28,16 @@ public class SessionsCRUD {
         return DriverManager.getConnection(url, connProps);
     }
 
-    // CREATE
-    public void addSession(int userId, String token, Timestamp startSessionDate, Timestamp endSessionDate) throws SQLException, IOException {
-        String SQL = "INSERT INTO sessions(user_id, token, start_session_date, end_session_date) VALUES(?,?,?,?)";
+    // Metodo CREATE aggiornato
+    public void addSession(int userId, String token, Timestamp startSessionDate, Timestamp endSessionDate, int idConnection) throws SQLException, IOException {
+        String SQL = "INSERT INTO sessions(user_id, token, start_session_date, end_session_date, id_connection) VALUES(?,?,?,?,?)";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setInt(1, userId);
             pstmt.setString(2, token);
             pstmt.setTimestamp(3, startSessionDate);
             pstmt.setTimestamp(4, endSessionDate);
+            pstmt.setInt(5, idConnection);
             pstmt.executeUpdate();
             System.out.println("Sessione aggiunta con successo.");
         }
@@ -44,7 +45,7 @@ public class SessionsCRUD {
 
     // READ
     public void getSession(int sessionId) throws SQLException, IOException {
-        String SQL = "SELECT id_session, user_id, token, start_session_date, end_session_date FROM sessions WHERE id_session = ?";
+        String SQL = "SELECT id_session, user_id, token, start_session_date, end_session_date, id_connection FROM sessions WHERE id_session = ?";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setInt(1, sessionId);

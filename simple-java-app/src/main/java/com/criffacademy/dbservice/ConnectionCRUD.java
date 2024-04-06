@@ -28,15 +28,14 @@ public class ConnectionCRUD {
         return DriverManager.getConnection(url, connProps);
     }
 
-    // CREATE
-    public void addConnection(int sessionId, String publicIp, int sourcePort, boolean isConnected) throws SQLException, IOException {
-        String SQL = "INSERT INTO connection(id_session, public_ip, source_port, isConnected) VALUES(?,?,?,?)";
+    // Metodo CREATE aggiornato
+    public void addConnection(String publicIp, int sourcePort, boolean isConnected) throws SQLException, IOException {
+        String SQL = "INSERT INTO connection(public_ip, source_port, isConnected) VALUES(?,?,?)";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
-            pstmt.setInt(1, sessionId);
-            pstmt.setString(2, publicIp);
-            pstmt.setInt(3, sourcePort);
-            pstmt.setBoolean(4, isConnected);
+            pstmt.setString(1, publicIp);
+            pstmt.setInt(2, sourcePort);
+            pstmt.setBoolean(3, isConnected);
             pstmt.executeUpdate();
             System.out.println("Connessione aggiunta con successo.");
         }

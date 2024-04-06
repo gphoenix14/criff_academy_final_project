@@ -89,4 +89,61 @@ public class UsersCRUD {
             }
         }
     }
-}
+        public boolean verifyUser(String username, String password) throws SQLException, IOException {
+            String SQL = "SELECT COUNT(*) FROM users WHERE username = ? AND pwd = ?";
+            try (Connection conn = connect();
+                 PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+            return false;
+        }
+    
+        // Metodo aggiuntivo per controllare se un utente esiste già
+        public boolean checkUserExists(String username) throws SQLException, IOException {
+            String SQL = "SELECT COUNT(*) FROM users WHERE username = ?";
+            try (Connection conn = connect();
+                 PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+                pstmt.setString(1, username);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+            return false;
+        }
+    
+        // Metodo aggiuntivo per ottenere l'ID dell'utente in base al nome utente
+        public int getUserIdByUsername(String username) throws SQLException, IOException {
+            String SQL = "SELECT id FROM users WHERE username = ?";
+            try (Connection conn = connect();
+                 PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+                pstmt.setString(1, username);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("id");
+                } else {
+                    throw new SQLException("Utente non trovato");
+                }
+            }
+        }
+    
+        // Metodo aggiuntivo per aggiornare lo stato stealth dell'utente
+        public void updateUserStealthMode(String username, boolean isStealth) throws SQLException, IOException {
+            String SQL = "UPDATE users SET isStealth = ? WHERE username = ?";
+            try (Connection conn = connect();
+                 PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+                pstmt.setBoolean(1, isStealth);
+                pstmt.setString(2, username);
+                int affectedRows = pstmt.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Aggiornamento dello stato stealth non riuscito.");
+                }
+            }
+        }
+    }
+

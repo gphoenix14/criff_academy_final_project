@@ -114,7 +114,6 @@ public class Client { // Definisce la classe Client
                 } else if (inputMessage.equalsIgnoreCase("/help")) {
                     System.out.println("[!]Crittografie disponibili: \n");
                     System.out.println("[!]Cesar Cipher (/cesar on , /cesar off): \n");
-                    System.out.println("[!]Transposition Cipher (/transposition on , /transposition  off): \n");
                     System.out.println("[!]Enigma (/enigma on , /enigma off): \n");
                     System.out.println("[!]AES256 (/aes on , /aes off): \n");
                     continue;

@@ -72,6 +72,7 @@ public class Server {
                         break;
                     } else if (message.equalsIgnoreCase("exit")) {
                         // Interruzione del ciclo in caso di messaggio "exit".
+                        in.close(); //IMPORTANTE - AGGIUNTO SENZA TEST
                         break;
                     }
                     // Broadcast del messaggio a tutti i client connessi.

@@ -2,7 +2,6 @@ package com.criffacademy.cryptoservice;
 public class CifrarioDiCesare {
     // Dizionario utilizzato per il cifrario di Cesare
     private static final String DIZIONARIO = "abcdefghijklmnopqrstuvwxyz";
-    private int shift = 0;
 
     // Metodo principale del programma
     public static void main(String[] args) {
