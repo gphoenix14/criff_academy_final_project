@@ -1,5 +1,5 @@
 // Dichiarazione del pacchetto in cui si trova la classe.
-package com.criffacademy.service;
+package com.criffacademy.cryptoservice;
 
 // Importazione delle classi necessarie per la crittografia.
 import javax.crypto.Cipher;

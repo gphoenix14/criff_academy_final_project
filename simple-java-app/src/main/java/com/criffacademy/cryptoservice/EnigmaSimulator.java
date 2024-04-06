@@ -1,4 +1,4 @@
-package com.criffacademy.service;
+package com.criffacademy.cryptoservice;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;

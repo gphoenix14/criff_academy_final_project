@@ -1,13 +1,14 @@
 package com.criffacademy;
-import com.criffacademy.service.CryptoUtils; // Importa la classe CryptoUtils dal package service
-import com.criffacademy.service.EnigmaSimulator; // Importa la classe EnigmaSimulator dal package service
-import com.criffacademy.service.CifrarioDiCesare;
 import java.io.FileInputStream; // Importa la classe FileInputStream dal package java.io
 import java.io.IOException; // Importa la classe IOException dal package java.io
 import java.io.PrintWriter; // Importa la classe PrintWriter dal package java.io
 import java.net.Socket; // Importa la classe Socket dal package java.net
 import java.util.Properties; // Importa la classe Properties dal package java.util
 import java.util.Scanner; // Importa la classe Scanner dal package java.util
+
+import com.criffacademy.cryptoservice.CifrarioDiCesare;
+import com.criffacademy.cryptoservice.CryptoUtils;
+import com.criffacademy.cryptoservice.EnigmaSimulator;
 
 public class Client { // Definisce la classe Client
     private static String sharedSecret = getPSK("app.properties"); // Variabile statica che contiene la chiave condivisa
