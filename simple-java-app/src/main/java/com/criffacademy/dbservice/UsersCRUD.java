@@ -89,19 +89,19 @@ public class UsersCRUD {
             }
         }
     }
-        public boolean verifyUser(String username, String password) throws SQLException, IOException {
-            String SQL = "SELECT COUNT(*) FROM users WHERE username = ? AND pwd = ?";
-            try (Connection conn = connect();
-                 PreparedStatement pstmt = conn.prepareStatement(SQL)) {
-                pstmt.setString(1, username);
-                pstmt.setString(2, password);
-                ResultSet rs = pstmt.executeQuery();
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+    public boolean verifyUser(String username, String hashedPassword) throws SQLException, IOException {
+        String SQL = "SELECT COUNT(*) FROM users WHERE username = ? AND pwd = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, hashedPassword);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
             }
-            return false;
         }
+        return false;
+    }
     
         // Metodo aggiuntivo per controllare se un utente esiste già
         public boolean checkUserExists(String username) throws SQLException, IOException {

@@ -29,14 +29,16 @@ public class SessionsCRUD {
     }
 
     // Metodo CREATE aggiornato
-    public void addSession(int userId, String token, Timestamp startSessionDate, Timestamp endSessionDate, int idConnection) throws SQLException, IOException {
+    public void addSession(int userId, String token, Timestamp startSessionDate, int idConnection) throws SQLException, IOException {
+        // Imposta la data di fine sessione a un valore predefinito, ad esempio la data di inizio + 1 ora
+        Timestamp endSessionDate = new Timestamp(startSessionDate.getTime() + 3600 * 1000); // +1 ora in millisecondi
         String SQL = "INSERT INTO sessions(user_id, token, start_session_date, end_session_date, id_connection) VALUES(?,?,?,?,?)";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setInt(1, userId);
             pstmt.setString(2, token);
             pstmt.setTimestamp(3, startSessionDate);
-            pstmt.setTimestamp(4, endSessionDate);
+            pstmt.setTimestamp(4, endSessionDate); // Usa la data di fine predefinita
             pstmt.setInt(5, idConnection);
             pstmt.executeUpdate();
             System.out.println("Sessione aggiunta con successo.");

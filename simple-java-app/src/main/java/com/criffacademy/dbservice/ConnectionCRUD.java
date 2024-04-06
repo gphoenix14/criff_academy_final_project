@@ -28,9 +28,22 @@ public class ConnectionCRUD {
         return DriverManager.getConnection(url, connProps);
     }
 
+    public int getLatestConnectionId() throws SQLException, IOException {
+        String SQL = "SELECT MAX(id_connection) FROM connection";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                throw new SQLException("Impossibile recuperare l'ultimo ID di connessione");
+            }
+        }
+    }
+    
     // Metodo CREATE aggiornato
     public void addConnection(String publicIp, int sourcePort, boolean isConnected) throws SQLException, IOException {
-        String SQL = "INSERT INTO connection(public_ip, source_port, isConnected) VALUES(?,?,?)";
+        String SQL = "INSERT INTO connection(public_ip, source_port, isConnected) VALUES(CAST(? AS INET),?,?)";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setString(1, publicIp);
@@ -40,6 +53,7 @@ public class ConnectionCRUD {
             System.out.println("Connessione aggiunta con successo.");
         }
     }
+    
 
     // READ
     public void getConnection(int connectionId) throws SQLException, IOException {

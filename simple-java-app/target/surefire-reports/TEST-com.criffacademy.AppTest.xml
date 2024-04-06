@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.criffacademy.AppTest" time="0.018" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.criffacademy.AppTest" time="0.017" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="22"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
-    <property name="java.class.path" value="/home/kali/projects/java/criff_academy/simple-java-app/target/test-classes:/home/kali/projects/java/criff_academy/simple-java-app/target/classes:/root/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/root/.m2/repository/org/postgresql/postgresql/42.7.3/postgresql-42.7.3.jar:/root/.m2/repository/org/checkerframework/checker-qual/3.42.0/checker-qual-3.42.0.jar:"/>
+    <property name="java.class.path" value="/home/kali/projects/java/criff_academy/simple-java-app/target/test-classes:/home/kali/projects/java/criff_academy/simple-java-app/target/classes:/root/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/root/.m2/repository/org/postgresql/postgresql/42.7.3/postgresql-42.7.3.jar:/root/.m2/repository/org/checkerframework/checker-qual/3.42.0/checker-qual-3.42.0.jar:/root/.m2/repository/io/jsonwebtoken/jjwt-api/0.11.2/jjwt-api-0.11.2.jar:/root/.m2/repository/io/jsonwebtoken/jjwt-impl/0.11.2/jjwt-impl-0.11.2.jar:/root/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.11.2/jjwt-jackson-0.11.2.jar:/root/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.9.10.4/jackson-databind-2.9.10.4.jar:/root/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.9.10/jackson-annotations-2.9.10.jar:/root/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.9.10/jackson-core-2.9.10.jar:"/>
     <property name="java.vm.vendor" value="Debian"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.vendor.url" value="https://tracker.debian.org/openjdk-22"/>
@@ -12,9 +12,9 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-22-openjdk-amd64/lib"/>
-    <property name="sun.java.command" value="/home/kali/projects/java/criff_academy/simple-java-app/target/surefire/surefirebooter-20240406074341889_3.jar /home/kali/projects/java/criff_academy/simple-java-app/target/surefire 2024-04-06T07-43-41_799-jvmRun1 surefire-20240406074341889_1tmp surefire_0-20240406074341889_2tmp"/>
+    <property name="sun.java.command" value="/home/kali/projects/java/criff_academy/simple-java-app/target/surefire/surefirebooter-20240406092117493_3.jar /home/kali/projects/java/criff_academy/simple-java-app/target/surefire 2024-04-06T09-21-17_441-jvmRun1 surefire-20240406092117493_1tmp surefire_0-20240406092117493_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="/home/kali/projects/java/criff_academy/simple-java-app/target/test-classes:/home/kali/projects/java/criff_academy/simple-java-app/target/classes:/root/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/root/.m2/repository/org/postgresql/postgresql/42.7.3/postgresql-42.7.3.jar:/root/.m2/repository/org/checkerframework/checker-qual/3.42.0/checker-qual-3.42.0.jar:"/>
+    <property name="surefire.test.class.path" value="/home/kali/projects/java/criff_academy/simple-java-app/target/test-classes:/home/kali/projects/java/criff_academy/simple-java-app/target/classes:/root/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/root/.m2/repository/org/postgresql/postgresql/42.7.3/postgresql-42.7.3.jar:/root/.m2/repository/org/checkerframework/checker-qual/3.42.0/checker-qual-3.42.0.jar:/root/.m2/repository/io/jsonwebtoken/jjwt-api/0.11.2/jjwt-api-0.11.2.jar:/root/.m2/repository/io/jsonwebtoken/jjwt-impl/0.11.2/jjwt-impl-0.11.2.jar:/root/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.11.2/jjwt-jackson-0.11.2.jar:/root/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.9.10.4/jackson-databind-2.9.10.4.jar:/root/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.9.10/jackson-annotations-2.9.10.jar:/root/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.9.10/jackson-core-2.9.10.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="/root"/>
     <property name="user.language" value="en"/>
@@ -27,7 +27,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="surefire.real.class.path" value="/home/kali/projects/java/criff_academy/simple-java-app/target/surefire/surefirebooter-20240406074341889_3.jar"/>
+    <property name="surefire.real.class.path" value="/home/kali/projects/java/criff_academy/simple-java-app/target/surefire/surefirebooter-20240406092117493_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="22-ea+32-Debian-1"/>
     <property name="user.name" value="root"/>
@@ -53,5 +53,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="66.0"/>
   </properties>
-  <testcase name="testApp" classname="com.criffacademy.AppTest" time="0.003"/>
+  <testcase name="testApp" classname="com.criffacademy.AppTest" time="0.001"/>
 </testsuite>
