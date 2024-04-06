@@ -13,11 +13,11 @@ public class UserController {
     private SessionsCRUD sessionsCrud = new SessionsCRUD();
     private ConnectionCRUD connectionCrud = new ConnectionCRUD();
 
-    public String user_login(String username, String password, String publicIp, int sourcePort) throws NoSuchAlgorithmException, SQLException, IOException {
+    public LoginResponse user_login(String username, String password, String publicIp, int sourcePort) throws NoSuchAlgorithmException, SQLException, IOException {
         // Verifica credenziali
         String hashedPassword = hashPassword(password);
         if (!usersCrud.verifyUser(username, hashedPassword)) {
-            return "InvalidCredentials";
+            return null; // Invece di restituire null, potresti considerare di lanciare un'eccezione o restituire un oggetto LoginResponse con JWT e refresh token null/empty.
         }
         
         int userId = usersCrud.getUserIdByUsername(username);
@@ -38,9 +38,10 @@ public class UserController {
         // Aggiungi sessione (refresh token) al database, includendo l'ID di connessione e il timestamp di scadenza
         sessionsCrud.addSession(userId, refreshToken, new Timestamp(System.currentTimeMillis()), expiresAt, connectionId);
         
-        // Restituisce JWT al client
-        return jwt;
+        // Restituisce un oggetto LoginResponse contenente sia il JWT che il refresh token
+        return new LoginResponse(jwt, refreshToken);
     }
+    
     
     public void user_logout(String refreshToken) throws SQLException, IOException {
         // Recupera l'ID della sessione e l'ID della connessione associati al refresh token fornito

@@ -1,6 +1,8 @@
+package com.criffacademy.controller;
+
 public class LoginResponse {
-    private final String jwt;
-    private final String refreshToken;
+    private String jwt;
+    private String refreshToken;
 
     public LoginResponse(String jwt, String refreshToken) {
         this.jwt = jwt;

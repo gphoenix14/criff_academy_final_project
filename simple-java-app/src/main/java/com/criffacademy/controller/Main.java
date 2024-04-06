@@ -16,14 +16,25 @@ public class Main {
             LoginResponse loginResponse = null;
     
             if (userController.userExists(username)) {
+                // Se l'utente esiste, tenta il login
                 loginResponse = userController.user_login(username, password, "192.168.1.1", 8080);
-                if (loginResponse == null || "InvalidCredentials".equals(loginResponse.getJwt())) {
+                if (loginResponse == null || loginResponse.getJwt().equals("InvalidCredentials")) {
                     System.out.println("Credenziali non valide. Riprova.");
                 } else {
                     System.out.println("Login effettuato con successo. Il tuo JWT è: " + loginResponse.getJwt());
                 }
             } else {
-                // Gestione registrazione...
+                // Se l'utente non esiste, invoca il metodo di sign up
+                String signupResult = userController.user_signup(username, password);
+                System.out.println(signupResult);
+                
+                // Dopo la registrazione, effettua il login per ottenere JWT e refresh token
+                loginResponse = userController.user_login(username, password, "192.168.1.1", 8080);
+                if (loginResponse != null && !loginResponse.getJwt().isEmpty()) {
+                    System.out.println("Registrazione e login effettuati con successo. Il tuo JWT è: " + loginResponse.getJwt());
+                } else {
+                    System.out.println("Errore nel processo di login dopo la registrazione.");
+                }
             }
     
             if (loginResponse != null && loginResponse.getJwt() != null && !loginResponse.getJwt().isEmpty()) {
@@ -40,5 +51,4 @@ public class Main {
             scanner.close();
         }
     }
-    
 }
