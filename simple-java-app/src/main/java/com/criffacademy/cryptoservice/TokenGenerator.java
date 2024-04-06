@@ -31,7 +31,7 @@ public class TokenGenerator {
         }
     }
 
-    public static String generateToken(String username) {
+    public static String generateRefreshToken(String username) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
 

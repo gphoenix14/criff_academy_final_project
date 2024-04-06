@@ -44,10 +44,10 @@ CREATE TABLE files (
 CREATE TABLE sessions (
     id_session SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    token VARCHAR(255) NOT NULL UNIQUE,
     start_session_date TIMESTAMP NOT NULL,
-    end_session_date TIMESTAMP NOT NULL,
+    end_session_date TIMESTAMP,
     id_connection INTEGER NOT NULL,
+    refresh_token VARCHAR(255) NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (id_connection) REFERENCES connection(id_connection) ON DELETE CASCADE
 );

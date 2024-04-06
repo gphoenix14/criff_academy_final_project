@@ -29,19 +29,28 @@ public class SessionsCRUD {
     }
 
     // Metodo CREATE aggiornato
-    public void addSession(int userId, String token, Timestamp startSessionDate, int idConnection) throws SQLException, IOException {
-        // Imposta la data di fine sessione a un valore predefinito, ad esempio la data di inizio + 1 ora
-        Timestamp endSessionDate = new Timestamp(startSessionDate.getTime() + 3600 * 1000); // +1 ora in millisecondi
-        String SQL = "INSERT INTO sessions(user_id, token, start_session_date, end_session_date, id_connection) VALUES(?,?,?,?,?)";
+    public void addSession(int userId, String refreshToken, Timestamp startSessionDate, int idConnection) throws SQLException, IOException {
+        String SQL = "INSERT INTO sessions(user_id, refresh_token, start_session_date, id_connection) VALUES(?,?,?,?)";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setInt(1, userId);
-            pstmt.setString(2, token);
+            pstmt.setString(2, refreshToken);
             pstmt.setTimestamp(3, startSessionDate);
-            pstmt.setTimestamp(4, endSessionDate); // Usa la data di fine predefinita
-            pstmt.setInt(5, idConnection);
+            pstmt.setInt(4, idConnection); // Aggiunge l'ID di connessione come parametro
             pstmt.executeUpdate();
             System.out.println("Sessione aggiunta con successo.");
+        }
+    }
+    
+    
+    
+    
+    public void deleteSessionByRefreshToken(String refreshToken) throws SQLException, IOException {
+        String SQL = "DELETE FROM sessions WHERE refresh_token = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            pstmt.setString(1, refreshToken);
+            pstmt.executeUpdate();
         }
     }
 
@@ -95,4 +104,19 @@ public class SessionsCRUD {
             }
         }
     }
+
+    public int[] findSessionAndConnectionIdByToken(String token) throws SQLException, IOException {
+        String SQL = "SELECT id_session, id_connection FROM sessions WHERE token = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            pstmt.setString(1, token);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new int[]{rs.getInt("id_session"), rs.getInt("id_connection")};
+                }
+            }
+        }
+        return new int[]{-1, -1}; // Restituisce -1 se non trova la sessione o la connessione
+    }
+    
 }

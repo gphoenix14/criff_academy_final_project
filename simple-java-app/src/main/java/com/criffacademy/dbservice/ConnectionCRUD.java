@@ -80,15 +80,10 @@ public class ConnectionCRUD {
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setBoolean(1, isConnected);
             pstmt.setInt(2, connectionId);
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                System.out.println("Stato della connessione aggiornato con successo.");
-            } else {
-                System.out.println("Aggiornamento non riuscito.");
-            }
+            pstmt.executeUpdate();
         }
     }
+    
 
     // DELETE
     public void deleteConnection(int connectionId) throws SQLException, IOException {
