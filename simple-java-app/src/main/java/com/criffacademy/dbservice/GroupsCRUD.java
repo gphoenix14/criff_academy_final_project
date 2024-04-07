@@ -152,7 +152,7 @@ public class GroupsCRUD {
         }
     }
 
-    public int getGroupIDFromGroupName(String groupName) throws SQLException, IOException {
+    public static int getGroupIDFromGroupName(String groupName) throws SQLException, IOException {
         String SQL = "SELECT group_id FROM groups WHERE group_name = ?";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {

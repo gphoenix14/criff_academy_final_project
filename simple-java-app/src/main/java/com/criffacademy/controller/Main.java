@@ -1,13 +1,15 @@
 package com.criffacademy.controller;
 
-import java.util.Scanner;
+import java.sql.Timestamp;
 
+import java.util.Scanner;
 import com.criffacademy.general.LoginResponse;
 
 public class Main {
     public static void main(String[] args) {
         UserController userController = new UserController();
         GroupController groupController = new GroupController();
+        MessageController messageController = new MessageController();
         Scanner scanner = new Scanner(System.in);
     
         System.out.println("Benvenuto! Inserisci il tuo username:");
@@ -74,9 +76,74 @@ public class Main {
                     System.out.println("Password del gruppo non corretta. Accesso negato.");
                 }
             }
+
+            System.out.println("Vuoi inviare un messaggio? (s/n):");
+            String sceltaInvioMessaggio = scanner.nextLine();
+            
+            if ("s".equalsIgnoreCase(sceltaInvioMessaggio)) {
+                // Qui assumiamo che l'utente possa scegliere di inviare un messaggio a un gruppo o a un singolo utente.
+                System.out.println("Il messaggio è per un gruppo o per un utente? (gruppo/utente):");
+                String tipoDestinazione = scanner.nextLine();
+                
+                String groupDstName = null;
+                String userDstUsername = null;
+                if ("gruppo".equalsIgnoreCase(tipoDestinazione)) {
+                    System.out.println("Inserisci il nome del gruppo destinatario del messaggio:");
+                    groupDstName = scanner.nextLine();
+                } else if ("utente".equalsIgnoreCase(tipoDestinazione)) {
+                    System.out.println("Inserisci l'username dell'utente destinatario del messaggio:");
+                    userDstUsername = scanner.nextLine();
+                }
+                
+                // Chiede se il messaggio è unicast, multicast o broadcast
+                System.out.println("Il messaggio è unicast, multicast o broadcast? (unicast/multicast/broadcast):");
+                String tipoMessaggio = scanner.nextLine();
+                boolean isUnicast = "unicast".equalsIgnoreCase(tipoMessaggio);
+                boolean isMulticast = "multicast".equalsIgnoreCase(tipoMessaggio);
+                boolean isBroadcast = "broadcast".equalsIgnoreCase(tipoMessaggio);
+                
+                // Chiede se il messaggio ha un allegato
+                System.out.println("Il messaggio ha un allegato? (s/n):");
+                boolean hasAttachment = "s".equalsIgnoreCase(scanner.nextLine());
+                
+                int attachmentId = 0;
+                if (hasAttachment) {
+                    System.out.println("Inserisci l'ID dell'allegato:");
+                    attachmentId = Integer.parseInt(scanner.nextLine());
+                }
+                
+                // Chiede il testo del messaggio
+                System.out.println("Inserisci il testo del messaggio:");
+                String msgText = scanner.nextLine();
+
+                Timestamp now = new Timestamp(System.currentTimeMillis());
+
+                // Invia il messaggio con il timestamp corrente
+                try {
+                    messageController.sendMessage(username, loginResponse.getJwt(), isUnicast, isMulticast, isBroadcast, groupDstName, userDstUsername, hasAttachment, attachmentId, msgText, now);
+                } catch (Exception e) {
+                    System.out.println("Si è verificato un errore durante l'invio del messaggio: " + e.getMessage());
+                }
+            }
+
+            System.out.println("Vuoi leggere i nuovi messaggi? (s/n):");
+String sceltaLetturaMessaggi = scanner.nextLine();
+
+if ("s".equalsIgnoreCase(sceltaLetturaMessaggi)) {
+    System.out.println("Inserisci il nome del gruppo da cui vuoi leggere i messaggi:");
+    String groupName = scanner.nextLine();
+    System.out.println("Inserisci la data e ora da cui vuoi iniziare a leggere i messaggi (formato YYYY-MM-DD HH:MM:SS):");
+    String datetime = scanner.nextLine();
+
+    try {
+        messageController.readMessages(username, groupName, loginResponse.getJwt(), datetime);
+    } catch (Exception e) {
+        System.out.println("Si è verificato un errore durante la lettura dei messaggi: " + e.getMessage());
+    }
+}
+
+System.out.println("Vuoi effettuare il logout? (s/n):");
     
-            // Chiede all'utente se vuole effettuare il logout
-            System.out.println("Vuoi effettuare il logout? (s/n):");
             String logoutChoice = scanner.nextLine();
             if ("s".equalsIgnoreCase(logoutChoice)) {
                 userController.user_logout(loginResponse.getRefreshToken());

@@ -3,6 +3,7 @@ package com.criffacademy.controller;
 import com.criffacademy.cryptoservice.TokenUtils;
 import com.criffacademy.dbservice.GroupsCRUD;
 import com.criffacademy.dbservice.UsersGroupsCRUD;
+import com.criffacademy.dbservice.UsersCRUD;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,6 +12,7 @@ import java.sql.SQLException;
 public class GroupController {
     private static GroupsCRUD groupsCrud = new GroupsCRUD();
     private static UsersGroupsCRUD usersGroupsCrud = new UsersGroupsCRUD();
+    private static UsersCRUD usersCrud = new UsersCRUD();
 
     // Metodo per la creazione di un nuovo gruppo
     public void createGroup(String username, String jwt, String groupName, String groupPassword, String enigmaPSK, String aesPSK, int cesarShift, int defaultCrypto) throws NoSuchAlgorithmException, SQLException, IOException {
@@ -107,7 +109,7 @@ public class GroupController {
         if (!TokenUtils.verifyJWT(jwt)) {
             throw new SecurityException("Token JWT non valido o scaduto.");
         }
-        return groupsCrud.getGroupIDFromGroupName(groupName);
+        return GroupsCRUD.getGroupIDFromGroupName(groupName);
     }
 
     public static void addUserToGroup(String username, String groupName, boolean isOwner, String jwt) throws SQLException, IOException, NoSuchAlgorithmException {
@@ -120,7 +122,7 @@ public class GroupController {
         int userId = UserController.getUserIdByUsername(username);
 
         // Poi, ottieni l'ID del gruppo dato il suo nome
-        int groupId = groupsCrud.getGroupIDFromGroupName(groupName);
+        int groupId = GroupsCRUD.getGroupIDFromGroupName(groupName);
 
         // Ora, usa il metodo di UsersGroupsCRUD per aggiungere l'utente al gruppo
         usersGroupsCrud.addUserToGroup(userId, groupId, isOwner);

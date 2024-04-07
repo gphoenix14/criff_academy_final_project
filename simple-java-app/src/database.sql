@@ -59,11 +59,16 @@ CREATE TABLE messages (
     isUnicast BOOLEAN NOT NULL,
     isMulticast BOOLEAN NOT NULL,
     isBroadcast BOOLEAN NOT NULL,
-    group_dst_id INT NOT NULL,
+    group_dst_id INT,
+    user_dst_id INT,
     hasAttachment BOOLEAN NOT NULL,
-    attachment_id INT NOT NULL,
+    attachment_id INT,
     msg_text TEXT NOT NULL,
+    msg_timestamp TIMESTAMP NOT NULL, -- Cambiato DATETIME a TIMESTAMP
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (group_dst_id) REFERENCES groups(group_id) ON DELETE CASCADE,
-    FOREIGN KEY (attachment_id) REFERENCES files(id_file) ON DELETE CASCADE
+    FOREIGN KEY (attachment_id) REFERENCES files(id_file) ON DELETE CASCADE,
+    FOREIGN KEY (user_dst_id) REFERENCES users(id) ON DELETE CASCADE 
 );
+
+
