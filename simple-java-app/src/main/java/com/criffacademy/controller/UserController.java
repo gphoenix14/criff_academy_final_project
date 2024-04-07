@@ -3,7 +3,7 @@ package com.criffacademy.controller;
 import com.criffacademy.dbservice.UsersCRUD;
 import com.criffacademy.dbservice.SessionsCRUD;
 import com.criffacademy.dbservice.ConnectionCRUD;
-import com.criffacademy.cryptoservice.TokenGenerator;
+import com.criffacademy.cryptoservice.TokenUtils;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -22,8 +22,8 @@ public class UserController {
         }
         
         int userId = usersCrud.getUserIdByUsername(username);
-        String jwt = TokenGenerator.generateJWT(username);
-        String refreshToken = TokenGenerator.generateRefreshToken(username);
+        String jwt = TokenUtils.generateJWT(username);
+        String refreshToken = TokenUtils.generateRefreshToken(username);
         long refreshTokenExpiry = System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7); // 7 giorni
         Timestamp expiresAt = new Timestamp(refreshTokenExpiry);
         
@@ -94,7 +94,7 @@ public class UserController {
         // Assumiamo che sessionsCrud.checkRefreshTokenValid esista e verifichi la validità del refreshToken per l'username fornito
         boolean isValidRefreshToken = sessionsCrud.checkRefreshTokenValid(refreshToken, username);
         if (isValidRefreshToken) {
-            return TokenGenerator.generateJWT(username);
+            return TokenUtils.generateJWT(username);
         } else {
             // Considera la possibilità di lanciare un'eccezione specifica se il token non è valido o è scaduto
             throw new SecurityException("Refresh token non valido o scaduto.");

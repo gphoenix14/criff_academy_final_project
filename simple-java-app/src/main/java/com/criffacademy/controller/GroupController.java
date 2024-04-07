@@ -1,5 +1,6 @@
 package com.criffacademy.controller;
 
+import com.criffacademy.cryptoservice.TokenUtils;
 import com.criffacademy.dbservice.GroupsCRUD;
 import com.criffacademy.dbservice.UsersGroupsCRUD;
 import java.io.IOException;
@@ -13,11 +14,18 @@ public class GroupController {
     private UserController userController = new UserController();
 
     // Metodo per la creazione di un nuovo gruppo
-    public void createGroup(String username, String refreshToken, String groupName, String groupPassword, String enigmaPSK, String aesPSK, int cesarShift, int defaultCrypto) throws NoSuchAlgorithmException, SQLException, IOException {
+    public void createGroup(String username, String jwt, String groupName, String groupPassword, String enigmaPSK, String aesPSK, int cesarShift, int defaultCrypto) throws NoSuchAlgorithmException, SQLException, IOException {
         // Verifica la validità del refresh token e ottiene un nuovo JWT
-        String jwt = userController.refreshJWT(refreshToken, username);
-        if (jwt == null) {
+
+        if (!TokenUtils.verifyJWT(jwt)) {
             throw new SecurityException("Token JWT non valido o scaduto.");
+        }
+
+        boolean exists = groupsCrud.groupExists(groupName);
+
+
+        if (exists) {
+            throw new IllegalArgumentException("Il gruppo esiste già.");
         }
         
         // Aggiunge il gruppo al database
@@ -35,12 +43,11 @@ public class GroupController {
     }
 
     // Metodo per aggiornare i dettagli di un gruppo
-    public void updateGroupDetails(String username, String refreshToken, int groupId, String newGroupName, String newEnigmaPSK, String newAesPSK, int newCesarShift, int newDefaultCrypto) throws NoSuchAlgorithmException, SQLException, IOException {
+    public void updateGroupDetails(String username, String jwt, int groupId, String newGroupName, String newEnigmaPSK, String newAesPSK, int newCesarShift, int newDefaultCrypto) throws NoSuchAlgorithmException, SQLException, IOException {
         // Verifica la validità del refresh token e ottiene un nuovo JWT
-        String jwt = userController.refreshJWT(refreshToken, username);
-        if (jwt == null) {
+        if (!TokenUtils.verifyJWT(jwt)) {
             throw new SecurityException("Token JWT non valido o scaduto.");
-        }
+            }
         
         // Verifica se l'utente è il proprietario del gruppo
         if (!usersGroupsCrud.isUserOwnerOfGroup(UserController.getUserIdByUsername(username), groupId)) {
@@ -77,8 +84,13 @@ public class GroupController {
         return sb.toString();
     }
 
-    public boolean verifyGroupPassword(String groupName, String password) throws Exception {
+    public boolean verifyGroupPassword(String groupName, String password, String jwt) throws Exception {
         // Recupera la password hashata del gruppo dal database
+
+        if (!TokenUtils.verifyJWT(jwt)) {
+            throw new SecurityException("Token JWT non valido o scaduto.");
+        }
+
         String storedHash = groupsCrud.getGroupPasswordHash(groupName);
         if (storedHash == null) {
             throw new Exception("Gruppo non trovato");
@@ -91,13 +103,21 @@ public class GroupController {
         return storedHash.equals(passwordHash);
     }
 
-    public int getGroupIDFromGroupName(String groupName) throws SQLException, IOException {
+    public int getGroupIDFromGroupName(String groupName, String jwt) throws SQLException, IOException {
         // Chiama il metodo definito in GroupsCRUD per ottenere l'ID del gruppo
+        if (!TokenUtils.verifyJWT(jwt)) {
+            throw new SecurityException("Token JWT non valido o scaduto.");
+        }
         return groupsCrud.getGroupIDFromGroupName(groupName);
     }
 
-    public static void addUserToGroup(String username, String groupName, boolean isOwner) throws SQLException, IOException, NoSuchAlgorithmException {
+    public static void addUserToGroup(String username, String groupName, boolean isOwner, String jwt) throws SQLException, IOException, NoSuchAlgorithmException {
         // Prima, ottieni l'ID dell'utente dato il suo username
+
+        if (!TokenUtils.verifyJWT(jwt)) {
+            throw new SecurityException("Token JWT non valido o scaduto.");
+        }
+        
         int userId = UserController.getUserIdByUsername(username);
 
         // Poi, ottieni l'ID del gruppo dato il suo nome

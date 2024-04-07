@@ -166,6 +166,22 @@ public class GroupsCRUD {
             }
         }
     }
+
+    public boolean groupExists(String groupName) throws SQLException, IOException {
+        String SQL = "SELECT COUNT(*) FROM groups WHERE group_name = ?";
+        try (Connection conn = connect(); // Utilizza il metodo connect già definito nella classe
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            pstmt.setString(1, groupName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                // Se il conteggio è maggiore di 0, significa che il gruppo esiste
+                return rs.getInt(1) > 0;
+            } else {
+                // Se non ci sono risultati dalla query, il gruppo non esiste
+                return false;
+            }
+        }
+    }
     
 
     

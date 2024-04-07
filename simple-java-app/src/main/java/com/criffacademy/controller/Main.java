@@ -58,24 +58,19 @@ public class Main {
                 System.out.println("Scegli l'algoritmo di crittografia predefinito (1 per Enigma, 2 per AES, 3 per Cesare):");
                 int defaultCrypto = Integer.parseInt(scanner.nextLine());
             
-                groupController.createGroup(username, loginResponse.getRefreshToken(), groupName, groupPassword, enigmaPSK, aesPSK, cesarShift, defaultCrypto);
-                GroupController.addUserToGroup(username,groupName,true);
+                groupController.createGroup(username, loginResponse.getJwt(), groupName, groupPassword, enigmaPSK, aesPSK, cesarShift, defaultCrypto);
                 System.out.println("Gruppo creato con successo.");
             } else if ("accedi".equalsIgnoreCase(sceltaGruppo)) {
-                // Logica per accedere a un gruppo esistente
                 System.out.println("Inserisci il nome del gruppo a cui vuoi accedere:");
                 String groupName = scanner.nextLine();
                 System.out.println("Inserisci la password del gruppo:");
                 String groupPassword = scanner.nextLine();
                 // Verifica l'accesso al gruppo
-                if (groupController.verifyGroupPassword(groupName, groupPassword)) {
-                    GroupController.addUserToGroup(username,groupName,false);
+                if (groupController.verifyGroupPassword(groupName, groupPassword, loginResponse.getJwt())) {
                     System.out.println("Accesso al gruppo " + groupName + " effettuato con successo.");
                 } else {
                     System.out.println("Password del gruppo non corretta. Accesso negato.");
                 }
-                // Nota: Devi implementare la logica di verifica nel GroupController
-                System.out.println("Accesso al gruppo " + groupName + " effettuato con successo.");
             }
     
             // Chiede all'utente se vuole effettuare il logout
