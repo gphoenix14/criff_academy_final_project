@@ -152,17 +152,16 @@ public class GroupsCRUD {
         }
     }
 
-    public static int getGroupIDFromGroupName(String groupName) throws SQLException, IOException {
+    public static Integer getGroupIDFromGroupName(String groupName) throws SQLException, IOException {
         String SQL = "SELECT group_id FROM groups WHERE group_name = ?";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setString(1, groupName);
             ResultSet rs = pstmt.executeQuery();
-            
             if (rs.next()) {
                 return rs.getInt("group_id");
             } else {
-                throw new SQLException("Gruppo non trovato per il nome fornito: " + groupName);
+                return null; // O gestisci l'assenza dell'ID in un altro modo
             }
         }
     }
