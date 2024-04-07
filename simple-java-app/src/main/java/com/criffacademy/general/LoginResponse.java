@@ -1,4 +1,4 @@
-package com.criffacademy.controller;
+package com.criffacademy.general;
 
 public class LoginResponse {
     private String jwt;

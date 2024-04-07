@@ -2,6 +2,8 @@ package com.criffacademy.controller;
 
 import java.util.Scanner;
 
+import com.criffacademy.general.LoginResponse;
+
 public class Main {
     public static void main(String[] args) {
         UserController userController = new UserController();

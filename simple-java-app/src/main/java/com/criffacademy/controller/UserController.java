@@ -1,6 +1,7 @@
 package com.criffacademy.controller;
 
 import com.criffacademy.dbservice.UsersCRUD;
+import com.criffacademy.general.LoginResponse;
 import com.criffacademy.dbservice.SessionsCRUD;
 import com.criffacademy.dbservice.ConnectionCRUD;
 import com.criffacademy.cryptoservice.TokenUtils;
