@@ -5,6 +5,10 @@ import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
+import org.springframework.stereotype.Component;
+
+@Component
+
 public class UsersGroupsCRUD {
 
     private Connection connect() throws SQLException, IOException {

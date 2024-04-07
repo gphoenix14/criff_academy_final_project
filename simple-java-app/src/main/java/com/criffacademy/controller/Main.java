@@ -3,6 +3,10 @@ package com.criffacademy.controller;
 import java.sql.Timestamp;
 
 import java.util.Scanner;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import com.criffacademy.general.LoginResponse;
 
 public class Main {

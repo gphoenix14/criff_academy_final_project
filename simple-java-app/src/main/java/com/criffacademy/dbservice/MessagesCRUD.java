@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.springframework.stereotype.Component;
+
+@Component
+
 public class MessagesCRUD {
 
     private Connection connect() throws SQLException, IOException {

@@ -10,6 +10,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp; // Aggiunto per il supporto di Timestamp
 import java.util.List; // Aggiunto per il supporto di Liste
 
+import org.springframework.stereotype.Component;
+
+@Component
+
 public class MessageController {
 
     private MessagesCRUD messagesCRUD;

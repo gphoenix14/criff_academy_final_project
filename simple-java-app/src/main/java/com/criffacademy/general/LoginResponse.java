@@ -1,5 +1,8 @@
 package com.criffacademy.general;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class LoginResponse {
     private String jwt;
     private String refreshToken;

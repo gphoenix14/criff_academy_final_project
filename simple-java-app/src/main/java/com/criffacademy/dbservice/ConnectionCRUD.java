@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ConnectionCRUD {
 
     private Connection connect() throws SQLException, IOException {

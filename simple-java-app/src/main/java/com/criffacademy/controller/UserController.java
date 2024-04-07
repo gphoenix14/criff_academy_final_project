@@ -11,6 +11,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.security.MessageDigest;
 
+import org.springframework.stereotype.Component;
+
+@Component
+
 public class UserController {
     private static UsersCRUD usersCrud = new UsersCRUD();
     private SessionsCRUD sessionsCrud = new SessionsCRUD();

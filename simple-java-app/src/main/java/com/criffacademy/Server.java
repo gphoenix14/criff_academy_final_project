@@ -10,7 +10,10 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 // Definizione della classe Server.
+@Component
 public class Server {
     // Costante che definisce la porta su cui il server ascolta le connessioni.
     private static final int PORT = 8000;
@@ -18,17 +21,17 @@ public class Server {
     private static Set<PrintWriter> clientWriters = new HashSet<>();
 
     // Metodo principale di esecuzione del server.
-    public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            // Stampa a console dell'avvio del server sulla porta specificata.
-            System.out.println("Server avviato sulla porta " + PORT);
-            while (true) {
-                // Accetta connessioni in entrata e avvia un nuovo thread per gestire ciascun client.
-                new ClientHandler(serverSocket.accept()).start();
+    public void startServer() {
+        new Thread(() -> {
+            try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+                System.out.println("Server avviato sulla porta " + PORT);
+                while (true) {
+                    new ClientHandler(serverSocket.accept()).start();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     // Classe interna privata che gestisce le connessioni dei client.
