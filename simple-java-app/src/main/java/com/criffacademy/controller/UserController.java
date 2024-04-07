@@ -1,5 +1,8 @@
 package com.criffacademy.controller;
-import com.criffacademy.dbservice.*;
+
+import com.criffacademy.dbservice.UsersCRUD;
+import com.criffacademy.dbservice.SessionsCRUD;
+import com.criffacademy.dbservice.ConnectionCRUD;
 import com.criffacademy.cryptoservice.TokenGenerator;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -7,60 +10,44 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.security.MessageDigest;
 
-
 public class UserController {
-    private UsersCRUD usersCrud = new UsersCRUD();
+    private static UsersCRUD usersCrud = new UsersCRUD();
     private SessionsCRUD sessionsCrud = new SessionsCRUD();
     private ConnectionCRUD connectionCrud = new ConnectionCRUD();
 
     public LoginResponse user_login(String username, String password, String publicIp, int sourcePort) throws NoSuchAlgorithmException, SQLException, IOException {
-        // Verifica credenziali
         String hashedPassword = hashPassword(password);
         if (!usersCrud.verifyUser(username, hashedPassword)) {
-            return null; // Invece di restituire null, potresti considerare di lanciare un'eccezione o restituire un oggetto LoginResponse con JWT e refresh token null/empty.
+            return null; // Potresti lanciare un'eccezione personalizzata qui.
         }
         
         int userId = usersCrud.getUserIdByUsername(username);
-        
-        // Genera JWT
-        String jwt = TokenGenerator.generateJWT(username); // Assumi che esista un metodo simile per JWT
-        
-        // Genera refresh token con scadenza
+        String jwt = TokenGenerator.generateJWT(username);
         String refreshToken = TokenGenerator.generateRefreshToken(username);
-        // Calcola la scadenza per il refresh token (ad esempio, 7 giorni)
         long refreshTokenExpiry = System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7); // 7 giorni
         Timestamp expiresAt = new Timestamp(refreshTokenExpiry);
         
-        // Aggiungi dettagli connessione
         connectionCrud.addConnection(publicIp, sourcePort, true);
         int connectionId = connectionCrud.getLatestConnectionId();
         
-        // Aggiungi sessione (refresh token) al database, includendo l'ID di connessione e il timestamp di scadenza
         sessionsCrud.addSession(userId, refreshToken, new Timestamp(System.currentTimeMillis()), expiresAt, connectionId);
         
-        // Restituisce un oggetto LoginResponse contenente sia il JWT che il refresh token
         return new LoginResponse(jwt, refreshToken);
     }
     
-    
     public void user_logout(String refreshToken) throws SQLException, IOException {
-        // Recupera l'ID della sessione e l'ID della connessione associati al refresh token fornito
         int[] sessionAndConnectionIds = sessionsCrud.findSessionAndConnectionIdByToken(refreshToken);
         int sessionId = sessionAndConnectionIds[0];
         int connectionId = sessionAndConnectionIds[1];
     
         if (sessionId != -1 && connectionId != -1) {
-            // Cancellazione della sessione tramite refresh token
             sessionsCrud.deleteSessionByRefreshToken(refreshToken);
-    
-            // Aggiornamento dello stato della connessione a 'non connesso'
             connectionCrud.updateConnectionStatus(connectionId, false);
             System.out.println("Logout effettuato con successo. Stato della connessione aggiornato.");
         } else {
             System.out.println("Errore: Sessione o Connessione non trovata per il refresh token fornito.");
         }
     }
-    
     
     public boolean userExists(String username) {
         try {
@@ -73,13 +60,10 @@ public class UserController {
     
     public String user_signup(String username, String password) {
         try {
-            // Verifica se l'username esiste già
             if (usersCrud.checkUserExists(username)) {
                 return "username already taken";
             } else {
-                // Conversione della password in SHA-512
                 String hashedPassword = hashPassword(password);
-                // Aggiunge l'utente nel database
                 usersCrud.addUser(username, hashedPassword, false);
                 return "Signed up successfully!";
             }
@@ -91,7 +75,6 @@ public class UserController {
 
     public void set_stealthMode(String username) {
         try {
-            // Aggiorna lo stato stealth dell'utente a true
             usersCrud.updateUserStealthMode(username, true);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -100,11 +83,26 @@ public class UserController {
 
     public void reset_stealthMode(String username) {
         try {
-            // Aggiorna lo stato stealth dell'utente a false
             usersCrud.updateUserStealthMode(username, false);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // Metodo aggiunto per rinfrescare il JWT utilizzando un refresh token
+    public String refreshJWT(String refreshToken, String username) throws NoSuchAlgorithmException, SQLException, IOException {
+        // Assumiamo che sessionsCrud.checkRefreshTokenValid esista e verifichi la validità del refreshToken per l'username fornito
+        boolean isValidRefreshToken = sessionsCrud.checkRefreshTokenValid(refreshToken, username);
+        if (isValidRefreshToken) {
+            return TokenGenerator.generateJWT(username);
+        } else {
+            // Considera la possibilità di lanciare un'eccezione specifica se il token non è valido o è scaduto
+            throw new SecurityException("Refresh token non valido o scaduto.");
+        }
+    }
+
+    public static int getUserIdByUsername(String username) throws SQLException, IOException {
+        return usersCrud.getUserIdByUsername(username);
     }
 
     private String hashPassword(String password) throws NoSuchAlgorithmException {
@@ -119,5 +117,6 @@ public class UserController {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
-    }
+    
+}
 }

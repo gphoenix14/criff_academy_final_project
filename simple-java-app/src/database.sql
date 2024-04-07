@@ -9,6 +9,7 @@ CREATE TABLE users (
 CREATE TABLE groups (
     group_id SERIAL PRIMARY KEY,
     group_name VARCHAR(255) NOT NULL UNIQUE,
+    group_password VARCHAR(255) NOT NULL,
     enigmaPSK VARCHAR(255),
     aesPSK VARCHAR(255),
     cesarshift INT,

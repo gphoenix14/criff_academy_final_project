@@ -43,6 +43,34 @@ public class SessionsCRUD {
         }
     }
 
+    public boolean checkRefreshTokenValid(String refreshToken, String username) throws SQLException, IOException {
+        String SQL = "SELECT COUNT(*) FROM sessions WHERE refresh_token = ? AND user_id = (SELECT id FROM users WHERE username = ?)";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            pstmt.setString(1, refreshToken);
+            pstmt.setString(2, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
+    
+    public int getUserIdByRefreshToken(String refreshToken) throws SQLException, IOException {
+        String SQL = "SELECT user_id FROM sessions WHERE refresh_token = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            pstmt.setString(1, refreshToken);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("user_id");
+            }
+        }
+        return -1; // Indica che l'ID utente non è stato trovato
+    }
+    
     public void deleteSessionByRefreshToken(String refreshToken) throws SQLException, IOException {
         String SQL = "DELETE FROM sessions WHERE refresh_token = ?";
         try (Connection conn = connect();

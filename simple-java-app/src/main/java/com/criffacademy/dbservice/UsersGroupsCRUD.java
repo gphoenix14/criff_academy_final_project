@@ -30,12 +30,12 @@ public class UsersGroupsCRUD {
 
     // CREATE
     public void addUserToGroup(int userId, int groupId, boolean isOwner) throws SQLException, IOException {
-        String SQL = "INSERT INTO users_groups(user_id, group_id, isOwner) VALUES(?,?,?)";
-        try (Connection conn = connect();
+        String SQL = "INSERT INTO users_groups(user_id, group_id, isowner) VALUES(?,?,?)";
+        try (Connection conn = connect(); // Assicurati che questo sia il metodo di connessione corretto
              PreparedStatement pstmt = conn.prepareStatement(SQL)) {
             pstmt.setInt(1, userId);
             pstmt.setInt(2, groupId);
-            pstmt.setBoolean(3, isOwner);
+            pstmt.setBoolean(3, isOwner); // Questo sarà false per gli utenti che si uniscono, true solo per il creatore
             pstmt.executeUpdate();
             System.out.println("Utente aggiunto al gruppo con successo.");
         }
@@ -86,6 +86,26 @@ public class UsersGroupsCRUD {
             } else {
                 System.out.println("Rimozione non riuscita.");
             }
+        }
+    }
+
+    public boolean isUserOwnerOfGroup(int userId, int groupId) throws SQLException, IOException {
+        String SQL = "SELECT COUNT(*) FROM users_groups WHERE user_id = ? AND group_id = ? AND isOwner = TRUE";
+        
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+             
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, groupId);
+            
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0;
+            }
+            
+            return false;
         }
     }
 }
