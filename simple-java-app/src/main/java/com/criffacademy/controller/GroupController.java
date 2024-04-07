@@ -11,7 +11,6 @@ import java.sql.SQLException;
 public class GroupController {
     private static GroupsCRUD groupsCrud = new GroupsCRUD();
     private static UsersGroupsCRUD usersGroupsCrud = new UsersGroupsCRUD();
-    private UserController userController = new UserController();
 
     // Metodo per la creazione di un nuovo gruppo
     public void createGroup(String username, String jwt, String groupName, String groupPassword, String enigmaPSK, String aesPSK, int cesarShift, int defaultCrypto) throws NoSuchAlgorithmException, SQLException, IOException {
@@ -117,7 +116,7 @@ public class GroupController {
         if (!TokenUtils.verifyJWT(jwt)) {
             throw new SecurityException("Token JWT non valido o scaduto.");
         }
-        
+
         int userId = UserController.getUserIdByUsername(username);
 
         // Poi, ottieni l'ID del gruppo dato il suo nome
