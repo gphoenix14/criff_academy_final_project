@@ -7,8 +7,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
-import com.criffacademy.dbservice.GroupsCRUD;
-
 public class GroupController {
     private static GroupsCRUD groupsCrud = new GroupsCRUD();
     private static UsersGroupsCRUD usersGroupsCrud = new UsersGroupsCRUD();
@@ -30,7 +28,7 @@ public class GroupController {
         int groupId = groupsCrud.getLastGroupId();
         
         // Recupera l'ID dell'utente basato sul nome utente
-        int userId = userController.getUserIdByUsername(username);
+        int userId = UserController.getUserIdByUsername(username);
         
         // Aggiunge l'utente al gruppo come proprietario
         usersGroupsCrud.addUserToGroup(userId, groupId, true);
@@ -45,7 +43,7 @@ public class GroupController {
         }
         
         // Verifica se l'utente è il proprietario del gruppo
-        if (!usersGroupsCrud.isUserOwnerOfGroup(userController.getUserIdByUsername(username), groupId)) {
+        if (!usersGroupsCrud.isUserOwnerOfGroup(UserController.getUserIdByUsername(username), groupId)) {
             throw new SecurityException("L'utente non ha i permessi per aggiornare i dettagli del gruppo.");
         }
         
@@ -55,7 +53,7 @@ public class GroupController {
 
     public void deleteGroup(int groupId, String username) throws Exception {
         // Recupera l'ID dell'utente basato sul nome utente
-        int userId = userController.getUserIdByUsername(username);
+        int userId = UserController.getUserIdByUsername(username);
         
         // Verifica se l'utente è il proprietario del gruppo
         if (!usersGroupsCrud.isUserOwnerOfGroup(userId, groupId)) {

@@ -44,6 +44,7 @@ public class TokenGenerator {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static String generateRefreshToken(String username) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
@@ -58,6 +59,7 @@ public class TokenGenerator {
                 .compact();
     }
 
+    @SuppressWarnings("deprecation")
     public static String generateJWT(String username) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
