@@ -1,109 +1,110 @@
 package com.criffacademy;
-import com.criffacademy.service.CryptoUtils; // Importa la classe CryptoUtils dal package service
-import com.criffacademy.service.EnigmaSimulator; // Importa la classe EnigmaSimulator dal package service
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.Socket; 
+import java.util.Properties;
+import java.util.Scanner;
+
 import com.criffacademy.service.CifrarioDiCesare;
-import java.io.FileInputStream; // Importa la classe FileInputStream dal package java.io
-import java.io.IOException; // Importa la classe IOException dal package java.io
-import java.io.PrintWriter; // Importa la classe PrintWriter dal package java.io
-import java.net.Socket; // Importa la classe Socket dal package java.net
-import java.util.Properties; // Importa la classe Properties dal package java.util
-import java.util.Scanner; // Importa la classe Scanner dal package java.util
+import com.criffacademy.service.CryptoUtils;
+import com.criffacademy.service.EnigmaSimulator;
 
-public class Client { // Definisce la classe Client
-    private static String sharedSecret = getPSK("app.properties"); // Variabile statica che contiene la chiave condivisa
-    private static int cesar_shift = getCesarShift("app.properties");
-    private static boolean isEnigmaOn = false; // Variabile statica per controllare lo stato di Enigma
-    private static boolean isAesOn = false; // Variabile statica per controllare lo stato di AES
-    private static boolean isCesarOn = false;
+public class Client {
+    private static String sharedSecret = getPSK("app.properties");
+    private static int cesar_shift     = getCesarShift("app.properties");
+    private static boolean isEnigmaOn  = false;
+    private static boolean isAesOn     = false;
+    private static boolean isCesarOn   = false;
 
-    private static EnigmaSimulator enigmaSimulator; // Variabile statica per l'istanza dell'EnigmaSimulator
+    private static EnigmaSimulator enigmaSimulator;
 
     static {
         try {
-            enigmaSimulator = new EnigmaSimulator(); // Istanzia l'EnigmaSimulator
+            enigmaSimulator = new EnigmaSimulator();
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento: " + e.getMessage());
+            System.err.println("Errore nel caricamento EnigmaSimulator: " + e.getMessage());
             System.exit(1);
         }
     }
-    
 
-    public static void main(String[] args) { // Metodo principale del programma
-        if (args.length != 3) { // Controlla se sono stati passati tre argomenti da riga di comando
-            System.err.println("Usage: java Client <server-ip> <port> <username>"); // Stampa il messaggio di utilizzo
-            System.exit(1); // Esce dal programma con codice di errore 1
+    public static void main(String[] args) {
+        if (args.length != 3) {
+            System.err.println("Usage: java Client <server-ip> <port> <username>");
+            System.exit(1);
         }
 
-        String serverIp = args[0]; // Ottiene l'indirizzo IP del server dalla riga di comando
-        int port = Integer.parseInt(args[1]); // Ottiene la porta del server dalla riga di comando
-        String username = args[2]; // Ottiene lo username dall'utente dalla riga di comando
+        String serverIp = args[0];
+        int port = Integer.parseInt(args[1]);
+        String username = args[2];
 
-        try (Socket socket = new Socket(serverIp, port); // Crea una nuova connessione Socket
-             Scanner userInput = new Scanner(System.in); // Crea un nuovo oggetto Scanner per l'input utente
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) { // Crea un nuovo oggetto PrintWriter per scrivere sulla connessione
+        try (Socket socket = new Socket(serverIp, port);
+             Scanner userInput = new Scanner(System.in);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
 
-            out.println("[+1]" + username); // Invia un messaggio di connessione al server
-            System.out.println("Connected to server. Start typing messages (type 'exit' to quit)."); // Stampa un messaggio di connessione riuscita
+            out.println("[+1]" + username);
+            System.out.println("Connected to server. Start typing messages (type '/exit' to quit).");
 
-            Thread serverListener = new Thread(() -> { // Crea un nuovo thread per ascoltare i messaggi dal server
-                try (Scanner in = new Scanner(socket.getInputStream())) { // Crea un nuovo oggetto Scanner per leggere i messaggi dal server
-                    while (in.hasNextLine()) { // Continua a leggere i messaggi finché il server invia dati
-                        String message = in.nextLine(); // Legge un nuovo messaggio dal server
-                        if (message.startsWith("[+]") || message.startsWith("[-]") || message.startsWith("[!]")) { // Controlla se il messaggio è un messaggio di sistema
-                            System.out.println(message); // Stampa il messaggio di sistema
-                        } else { // Altrimenti, se è un messaggio normale
-                            try { // Prova a decodificare il messaggio
-                                String decryptedMessage = message; // Assume che il messaggio sia già decriptato
-                                if (isAesOn) { // Se è attivo l'AES
-                                    decryptedMessage = CryptoUtils.decrypt(message, sharedSecret); // Decifra il messaggio utilizzando AES
-                                } else if (isEnigmaOn) { // Altrimenti, se è attivo Enigma
-                                    decryptedMessage = enigmaSimulator.cifraDecifra(message, false); // Decifra il messaggio utilizzando Enigma
+            Thread serverListener = new Thread(() -> {
+                try (Scanner in = new Scanner(socket.getInputStream())) {
+                    while (in.hasNextLine()) {
+                        String message = in.nextLine();
+                        if (message.startsWith("[+]") || message.startsWith("[-]") || message.startsWith("[!]")) {
+                            System.out.println(message);
+                        } else {
+                            try {
+                                String decryptedMessage = message;
+                                if (isAesOn) {
+                                    decryptedMessage = CryptoUtils.decrypt(message, sharedSecret);
+                                } else if (isEnigmaOn) {
+                                    decryptedMessage = enigmaSimulator.cifraDecifra(message, false);
                                 } else if (isCesarOn) {
-                                    decryptedMessage = CifrarioDiCesare.decripta(message,cesar_shift);
+                                    decryptedMessage = CifrarioDiCesare.decripta(message, cesar_shift);
                                 }
-                                System.out.println(decryptedMessage); // Stampa il messaggio decodificato
-                            } catch (Exception e) { // Gestisce eventuali eccezioni
-                                System.out.println("Ricevuto messaggio non decriptabile"); // Stampa un messaggio di errore
+                                System.out.println(decryptedMessage);
+                            } catch (Exception e) {
+                                System.out.println("Ricevuto messaggio non decriptabile");
                             }
                         }
                     }
-                } catch (IOException e) { // Gestisce eventuali eccezioni di IO
-                    e.printStackTrace(); // Stampa lo stack trace dell'eccezione
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
-            serverListener.start(); // Avvia il thread per ascoltare i messaggi dal server
+            serverListener.start();
 
-            while (true) { // Loop infinito per gestire l'input dell'utente
-                String inputMessage = userInput.nextLine(); // Legge l'input dell'utente
+            while (true) {
+                String inputMessage = userInput.nextLine();
 
-                // Gestione dei comandi speciali
-                if (inputMessage.equalsIgnoreCase("/exit")) { // Se l'utente vuole uscire
-                    out.println("[-1]" + username); // Invia un messaggio di disconnessione al server
-                    break; // Esce dal loop
-                } else if (inputMessage.equalsIgnoreCase("/enigma on")) { // Se l'utente vuole attivare Enigma
-                    isEnigmaOn = true; // Imposta lo stato di Enigma su attivo
-                    isAesOn = false; // Imposta lo stato di AES su disattivo
-                    isCesarOn = false;
+                // Comandi speciali
+                if (inputMessage.equalsIgnoreCase("/exit")) {
+                    out.println("[-1]" + username);
+                    break;
+                } else if (inputMessage.equalsIgnoreCase("/enigma on")) {
+                    isEnigmaOn = true;
+                    isAesOn    = false;
+                    isCesarOn  = false;
                     System.out.println("[+]Crittografia con enigma attivata");
-                    continue; // Passa al prossimo ciclo del loop
-                } else if (inputMessage.equalsIgnoreCase("/enigma off")) { // Se l'utente vuole disattivare Enigma
-                    isEnigmaOn = false; // Imposta lo stato di Enigma su disattivo
+                    continue;
+                } else if (inputMessage.equalsIgnoreCase("/enigma off")) {
+                    isEnigmaOn = false;
                     System.out.println("[-]Crittografia con enigma disattivata");
-                    continue; // Passa al prossimo ciclo del loop
-                } else if (inputMessage.equalsIgnoreCase("/aes on")) { // Se l'utente vuole attivare AES
-                    isAesOn = true; // Imposta lo stato di AES su attivo
-                    isEnigmaOn = false; // Imposta lo stato di Enigma su disattivo
-                    isCesarOn = false;
+                    continue;
+                } else if (inputMessage.equalsIgnoreCase("/aes on")) {
+                    isAesOn    = true;
+                    isEnigmaOn = false;
+                    isCesarOn  = false;
                     System.out.println("[+]Crittografia con AES attivata");
-                    continue; // Passa al prossimo ciclo del loop
-                } else if (inputMessage.equalsIgnoreCase("/aes off")) { // Se l'utente vuole disattivare AES
-                    isAesOn = false; // Imposta lo stato di AES su disattivo
+                    continue;
+                } else if (inputMessage.equalsIgnoreCase("/aes off")) {
+                    isAesOn = false;
                     System.out.println("[-]Crittografia con AES disattivata");
-                    continue; // Passa al prossimo ciclo del loop
+                    continue;
                 } else if (inputMessage.equalsIgnoreCase("/cesar on")) {
-                    isCesarOn = true;
-                    isAesOn = false; 
-                    isEnigmaOn = false; // Imposta lo stato di Enigma su disattivo
+                    isCesarOn  = true;
+                    isAesOn    = false;
+                    isEnigmaOn = false;
                     System.out.println("[+]Crittografia con Cesar Cipher attivata");
                     continue;
                 } else if (inputMessage.equalsIgnoreCase("/cesar off")) {
@@ -111,71 +112,81 @@ public class Client { // Definisce la classe Client
                     System.out.println("[-]Crittografia con Cesar Cipher disattivata");
                     continue;
                 } else if (inputMessage.equalsIgnoreCase("/help")) {
-                    System.out.println("[!]Crittografie disponibili: \n");
-                    System.out.println("[!]Cesar Cipher (/cesar on , /cesar off): \n");
-                    System.out.println("[!]Transposition Cipher (/transposition on , /transposition  off): \n");
-                    System.out.println("[!]Enigma (/enigma on , /enigma off): \n");
-                    System.out.println("[!]AES256 (/aes on , /aes off): \n");
+                    System.out.println("[!]Crittografie disponibili:\n");
+                    System.out.println("[!]Cesar Cipher (/cesar on, /cesar off)");
+                    System.out.println("[!]Enigma (/enigma on, /enigma off)");
+                    System.out.println("[!]AES256 (/aes on, /aes off)");
                     continue;
                 }
 
-                // Preparazione del messaggio con l'username
-                String messageToSend = username + ": " + inputMessage; // Costruisce il messaggio da inviare al server
+                // Preparazione messaggio
+                String messageToSend = username + ": " + inputMessage;
 
-                // Applicazione della crittografia se necessario
-                if (isAesOn) { // Se è attivo AES
-                    try { // Prova a criptare il messaggio utilizzando AES
-                        messageToSend = CryptoUtils.encrypt(messageToSend, sharedSecret); // Cripta il messaggio utilizzando AES
-                    } catch (Exception e) { // Gestisce eventuali eccezioni
-                        System.err.println("Errore nella crittografia del messaggio: " + e.getMessage()); // Stampa un messaggio di errore
-                        continue; // Salta all'iterazione successiva del loop
+                // Eventuale crittografia
+                if (isAesOn) {
+                    try {
+                        messageToSend = CryptoUtils.encrypt(messageToSend, sharedSecret);
+                    } catch (Exception e) {
+                        System.err.println("Errore nella crittografia AES: " + e.getMessage());
+                        continue;
                     }
-                } else if (isEnigmaOn) { // Se è attivo Enigma
-                    try { // Prova a cifrare il messaggio utilizzando Enigma
-                        messageToSend = enigmaSimulator.cifraDecifra(messageToSend, true); // Cifra il messaggio utilizzando Enigma
-                    } catch (Exception e) { // Gestisce eventuali eccezioni
-                        System.err.println("Errore nella crittografia con Enigma: " + e.getMessage()); // Stampa un messaggio di errore
-                        continue; // Salta all'iterazione successiva del loop
+                } else if (isEnigmaOn) {
+                    try {
+                        messageToSend = enigmaSimulator.cifraDecifra(messageToSend, true);
+                    } catch (Exception e) {
+                        System.err.println("Errore nella crittografia Enigma: " + e.getMessage());
+                        continue;
                     }
-                 } else if (isCesarOn) { 
-                        try { 
-                            messageToSend = CifrarioDiCesare.cripta(messageToSend,cesar_shift);
-                        } catch (Exception e) { 
-                            System.err.println("Errore nella crittografia con Cesar Cihper: " + e.getMessage()); 
-                            continue; 
-                        }
+                } else if (isCesarOn) {
+                    try {
+                        messageToSend = CifrarioDiCesare.cripta(messageToSend, cesar_shift);
+                    } catch (Exception e) {
+                        System.err.println("Errore nella crittografia Cesar: " + e.getMessage());
+                        continue;
+                    }
                 }
 
-                out.println(messageToSend); // Invia il messaggio criptato al server
+                out.println(messageToSend);
             }
 
-        } catch (IOException e) { // Gestisce eventuali eccezioni di IO
-            e.printStackTrace(); // Stampa lo stack trace dell'eccezione
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private static String getPSK(String filename) { // Metodo privato per ottenere la chiave condivisa dal file di configurazione
-        Properties prop = new Properties(); // Crea un nuovo oggetto Properties per gestire le proprietà
-        try (FileInputStream fis = new FileInputStream(filename)) { // Apre un file di input stream per leggere le proprietà
-            prop.load(fis); // Carica le proprietà dal file
-            return prop.getProperty("sharedSecret"); // Restituisce il valore della chiave condivisa dal file di configurazione
-        } catch (IOException e) { // Gestisce eventuali eccezioni di IO
-            e.printStackTrace(); // Stampa lo stack trace dell'eccezione
-            return null; // Restituisce null in caso di errore
-        }
-    }
-
-    private static int getCesarShift(String filename) { // Metodo corretto per ottenere lo shift del cifrario di Cesare dal file di configurazione
+    /**
+     * Carica la sharedSecret da un file di properties nel classpath.
+     */
+    private static String getPSK(String resourceName) {
         Properties prop = new Properties();
-        try (FileInputStream fis = new FileInputStream(filename)) {
-            prop.load(fis);
+        // Carichiamo app.properties come risorsa dal classpath
+        try (InputStream is = Client.class.getResourceAsStream("/" + resourceName)) {
+            if (is == null) {
+                throw new IOException("Impossibile trovare il file nel classpath: " + resourceName);
+            }
+            prop.load(is);
+            return prop.getProperty("sharedSecret");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Carica lo shift Cesare da un file di properties nel classpath.
+     */
+    private static int getCesarShift(String resourceName) {
+        Properties prop = new Properties();
+        try (InputStream is = Client.class.getResourceAsStream("/" + resourceName)) {
+            if (is == null) {
+                throw new IOException("Impossibile trovare il file nel classpath: " + resourceName);
+            }
+            prop.load(is);
             String shiftString = prop.getProperty("cesar_shift");
-            return Integer.parseInt(shiftString); // Converte la stringa in un intero
+            return Integer.parseInt(shiftString.trim());
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
-            return 0; // Restituisce 0 in caso di errore o se la conversione fallisce
+            return 0;
         }
     }
-
-    
 }
